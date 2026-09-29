@@ -1,9 +1,14 @@
 {
-  "name": "huce-nginx-demo-backend",
+  "name": "mini-product-api",
   "version": "1.0.0",
-  "description": "Node.js demo backend for NGINX Reverse Proxy - Lesson 8 HUCE",
+  "description": "Mini Product Management Backend for NGINX Load Balancing & Reverse Proxy Demo (HUCE)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.13.1"
   }
 }
