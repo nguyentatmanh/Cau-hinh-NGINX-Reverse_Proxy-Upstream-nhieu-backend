@@ -1,5 +1,94 @@
+# ==============================================================================
+# DOCKER COMPOSE CHO DỰ ÁN QUẢN LÝ SẢN PHẨM MINI - BUỔI 8 (NHÓM 7)
+# Trường Đại học Xây dựng Hà Nội (HUCE)
+# Kiến trúc: NGINX Gateway -> [api1:3000, api2:3000] -> PostgreSQL (db:5432)
+# Shared Volumes: pg_data (lưu trữ CSDL), uploads_data (lưu trữ ảnh dùng chung)
+# ==============================================================================
+
 services:
-  # NGINX Reverse Proxy Gateway
+  # 1. Cơ sở dữ liệu quan hệ PostgreSQL 16
+  db:
+    image: postgres:16-alpine
+    container_name: huce_postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: secret_password
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d product_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app_net
+
+  # 2. Backend Instance 1 (Node.js 20 Express)
+  api1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: huce_api_1
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - INSTANCE_ID=api1
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=product_db
+      - DB_USER=app_user
+      - DB_PASSWORD=secret_password
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - uploads_data:/app/uploads
+    expose:
+      - "3000"       # Chỉ mở trong mạng nội bộ Docker, không publish ra host
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - app_net
+
+  # 3. Backend Instance 2 (Node.js 20 Express)
+  api2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: huce_api_2
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - INSTANCE_ID=api2
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=product_db
+      - DB_USER=app_user
+      - DB_PASSWORD=secret_password
+      - UPLOAD_DIR=/app/uploads
+    volumes:
+      - uploads_data:/app/uploads
+    expose:
+      - "3000"       # Chỉ mở trong mạng nội bộ Docker, không publish ra host
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - app_net
+
+  # 4. NGINX Reverse Proxy Gateway - Điểm truy cập công khai duy nhất
   proxy:
     image: nginx:1.27-alpine
     container_name: huce_nginx_proxy
@@ -12,40 +101,16 @@ services:
       - ./frontend:/usr/share/nginx/html:ro
       - ./ssl:/etc/nginx/certs:ro
     depends_on:
-      - backend1
-      - backend2
+      - api1
+      - api2
     networks:
       - app_net
 
-  # Backend Node.js - Instance 1
-  backend1:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: huce_backend_1
-    restart: unless-stopped
-    environment:
-      - PORT=3000
-      - INSTANCE_ID=backend-1
-    expose:
-      - "3000"       # Chỉ mở trong mạng nội bộ Docker, không publish ra host
-    networks:
-      - app_net
-
-  # Backend Node.js - Instance 2
-  backend2:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: huce_backend_2
-    restart: unless-stopped
-    environment:
-      - PORT=3000
-      - INSTANCE_ID=backend-2
-    expose:
-      - "3000"       # Chỉ mở trong mạng nội bộ Docker, không publish ra host
-    networks:
-      - app_net
+volumes:
+  pg_data:
+    driver: local
+  uploads_data:
+    driver: local
 
 networks:
   app_net:

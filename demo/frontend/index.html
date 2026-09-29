@@ -4,121 +4,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo NGINX Reverse Proxy - Nhóm 7 (HUCE)</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Hệ thống Quản lý Sản phẩm Mini - NGINX Gateway Demo (HUCE)</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" type="image/png" href="/assets/huce_logo.png">
 </head>
 
 <body>
+    <!-- Top Academic Header -->
     <header class="app-header">
-        <div class="header-container">
+        <div class="header-inner">
             <div class="brand">
-                <h1>TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI</h1>
-                <h2>KHOA CÔNG NGHỆ THÔNG TIN • HỆ THỐNG SERVER NÂNG CAO</h2>
+                <img src="/assets/huce_logo.png" alt="HUCE Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h1>TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI</h1>
+                    <p>KHOA CÔNG NGHỆ THÔNG TIN • HỆ THỐNG SERVER NÂNG CAO - BUỔI 8</p>
+                </div>
             </div>
-            <div class="badge-group">
-                <span class="badge badge-primary">Buổi 8: NGINX Reverse Proxy</span>
-                <span class="badge badge-secondary">Nhóm 7</span>
+            <div class="gateway-badge">
+                <span class="badge-dot"></span>
+                <span id="gateway-status">NGINX Gateway: Port 8080/8443</span>
             </div>
         </div>
     </header>
 
-    <main class="main-container">
-        <!-- Banner thông tin kết nối -->
-        <section class="info-card">
-            <h3>Trạng thái Kết nối Hệ thống</h3>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label">Origin hiện tại:</span>
-                    <strong id="currentOrigin" class="value text-primary">-</strong>
+    <!-- Navigation Tabs -->
+    <nav class="app-nav">
+        <div class="nav-inner">
+            <button class="nav-btn active" data-tab="tab-products">
+                <span class="nav-icon">📦</span> Danh sách Sản phẩm
+            </button>
+            <button class="nav-btn" data-tab="tab-create">
+                <span class="nav-icon">➕</span> Thêm Sản phẩm Mới
+            </button>
+            <button class="nav-btn" data-tab="tab-upload">
+                <span class="nav-icon">📤</span> Tải ảnh & Thử mã 413
+            </button>
+            <button class="nav-btn" data-tab="tab-cluster">
+                <span class="nav-icon">⚖️</span> Cân bằng tải Upstream
+            </button>
+            <button class="nav-btn" data-tab="tab-headers">
+                <span class="nav-icon">🔍</span> Soi Forwarded Headers
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="app-main">
+        <!-- Toast Notification Alert -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- ============================================================= -->
+        <!-- TAB 1: DANH SÁCH SẢN PHẨM & TRANG CHI TIẾT (SPA)              -->
+        <!-- ============================================================= -->
+        <section id="tab-products" class="tab-pane active">
+            <!-- Sub-view A: Danh sách -->
+            <div id="view-product-list">
+                <div class="section-header">
+                    <div>
+                        <h2>Danh mục Sản phẩm (Đọc từ PostgreSQL)</h2>
+                        <p class="subtitle">Dữ liệu được truy vấn thực từ bảng <code>products</code> qua NGINX Reverse
+                            Proxy</p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="btn-refresh-products" class="btn btn-primary">
+                            <span>🔄 Làm mới Danh sách</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="info-item">
-                    <span class="label">Giao thức:</span>
-                    <strong id="currentProto" class="value">-</strong>
+
+                <!-- Thống kê Instance phục vụ -->
+                <div class="status-banner">
+                    <span class="banner-title">Phản hồi gần nhất:</span>
+                    <span id="list-instance-badge" class="instance-badge badge-neutral">Chưa có dữ liệu</span>
+                    <span id="list-total-badge" class="total-badge">0 sản phẩm</span>
+                    <span id="list-time-badge" class="time-badge">--:--:--</span>
                 </div>
-                <div class="info-item">
-                    <span class="label">Cổng NGINX Host:</span>
-                    <strong id="currentPort" class="value">-</strong>
+
+                <!-- Lưới danh sách sản phẩm -->
+                <div id="products-grid" class="products-grid">
+                    <div class="loading-state">Đang tải dữ liệu sản phẩm...</div>
                 </div>
-                <div class="info-item">
-                    <span class="label">Định tuyến API:</span>
-                    <strong class="value text-success">Same-Origin (/api/*)</strong>
+            </div>
+
+            <!-- Sub-view B: Chi tiết sản phẩm (Test SPA Route & F5) -->
+            <div id="view-product-detail" class="hidden">
+                <div class="detail-header">
+                    <button id="btn-back-to-list" class="btn btn-secondary">
+                        <span>⬅ Quay lại danh sách</span>
+                    </button>
+                    <span class="spa-hint">💡 Thử nhấn <b>F5 (Reload trang)</b> để kiểm tra cơ chế
+                        <code>try_files</code> của NGINX!</span>
+                </div>
+
+                <div id="product-detail-card" class="product-detail-card">
+                    <!-- Sẽ render bằng JavaScript -->
                 </div>
             </div>
         </section>
 
-        <!-- Khối điều khiển thí nghiệm -->
-        <div class="dashboard-grid">
-            <!-- Thử nghiệm 1 & 2: Gọi API Sản phẩm & Cân bằng tải Upstream -->
-            <section class="card">
-                <div class="card-header">
-                    <h3>1. Kiểm thử Reverse Proxy & Upstream</h3>
-                    <p class="subtitle">Chứng minh định tuyến Same-Origin & Cân bằng tải giữa backend1 và backend2</p>
+        <!-- ============================================================= -->
+        <!-- TAB 2: THÊM SẢN PHẨM MỚI                                      -->
+        <!-- ============================================================= -->
+        <section id="tab-create" class="tab-pane">
+            <div class="section-header">
+                <div>
+                    <h2>Thêm Sản phẩm Mới vào PostgreSQL</h2>
+                    <p class="subtitle">Gửi yêu cầu <code>POST /api/products</code> ghi dữ liệu trực tiếp vào CSDL</p>
                 </div>
-                <div class="card-body">
-                    <div class="btn-group">
-                        <button id="btnFetchSingle" class="btn btn-primary">Tải danh sách sản phẩm (1 req)</button>
-                        <button id="btnFetchLoadBalance" class="btn btn-secondary">Gửi liên tiếp 10 request (Test Load
-                            Balancing)</button>
+            </div>
+
+            <div class="form-card">
+                <form id="form-create-product">
+                    <div class="form-group">
+                        <label for="prod-name">Tên sản phẩm: <span class="req">*</span></label>
+                        <input type="text" id="prod-name" name="name" placeholder="Ví dụ: Router Mikrotik RB5009"
+                            required>
                     </div>
 
-                    <div id="lbSummary" class="lb-summary hidden">
-                        <div class="lb-stat"><span class="badge-backend1">backend-1:</span> <span id="countBe1">0</span>
-                            req</div>
-                        <div class="lb-stat"><span class="badge-backend2">backend-2:</span> <span id="countBe2">0</span>
-                            req</div>
+                    <div class="form-group">
+                        <label for="prod-price">Đơn giá (VNĐ): <span class="req">*</span></label>
+                        <input type="number" id="prod-price" name="price" placeholder="Ví dụ: 5500000" min="0"
+                            step="1000" required>
                     </div>
 
-                    <div id="productResults" class="result-area">
-                        <p class="placeholder-text">Nhấn nút bên trên để gửi request qua NGINX reverse proxy...</p>
+                    <div class="form-group">
+                        <label for="prod-desc">Mô tả kỹ thuật:</label>
+                        <textarea id="prod-desc" name="description" rows="3"
+                            placeholder="Nhập thông số kỹ thuật, cấu hình phần cứng..."></textarea>
                     </div>
-                </div>
-            </section>
 
-            <!-- Thử nghiệm 3: Kiểm tra Proxy Headers -->
-            <section class="card">
-                <div class="card-header">
-                    <h3>2. Kiểm tra Proxy Headers</h3>
-                    <p class="subtitle">Xác thực các header Host, X-Real-IP, X-Forwarded-For chuyển tới Backend</p>
-                </div>
-                <div class="card-body">
-                    <button id="btnCheckHeaders" class="btn btn-outline">Lấy thông tin Header (GET /api/info)</button>
-                    <div id="headerResults" class="result-area">
-                        <p class="placeholder-text">Chưa có dữ liệu header. Bấm nút để kiểm tra...</p>
+                    <div class="form-group">
+                        <label for="prod-image-url">Đường dẫn ảnh sản phẩm (Tùy chọn):</label>
+                        <input type="text" id="prod-image-url" name="imageUrl"
+                            placeholder="/assets/placeholder.svg hoặc URL ảnh">
                     </div>
-                </div>
-            </section>
 
-            <!-- Thử nghiệm 4: Giới hạn Request Body (Mã 413) -->
-            <section class="card full-width">
-                <div class="card-header">
-                    <h3>3. Kiểm thử Giới hạn Request Body (Mã HTTP 413)</h3>
-                    <p class="subtitle">Kiểm chứng chỉ thị client_max_body_size (mặc định 1m vs cấu hình mở rộng)</p>
-                </div>
-                <div class="card-body">
-                    <div class="upload-controls">
-                        <label class="control-label">Chọn dung lượng payload giả lập để gửi lên:</label>
-                        <select id="payloadSizeSelect" class="form-select">
-                            <option value="512000">500 KB (Hợp lệ, dưới 1 MB -> Dự kiến HTTP 200)</option>
-                            <option value="2097152" selected>2 MB (Vượt mức 1 MB mặc định -> Dự kiến HTTP 413)</option>
-                            <option value="5242880">5 MB (Vượt mức -> Dự kiến HTTP 413 hoặc HTTP 200 nếu đã tăng lên
-                                20M)</option>
-                        </select>
-                        <button id="btnTestUpload" class="btn btn-danger">Gửi Payload (POST /api/upload)</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success" id="btn-submit-product">
+                            <span>💾 Lưu Sản phẩm</span>
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <span>Nhập lại</span>
+                        </button>
                     </div>
-                    <div id="uploadResult" class="result-area">
-                        <p class="placeholder-text">Chọn kích thước payload và nhấn gửi để kiểm tra phản hồi từ NGINX...
-                        </p>
+                </form>
+
+                <div id="create-result" class="result-box hidden"></div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 3: TẢI ẢNH LÊN & KIỂM TRA MÃ LỖI 413                       -->
+        <!-- ============================================================= -->
+        <section id="tab-upload" class="tab-pane">
+            <div class="section-header">
+                <div>
+                    <h2>Kiểm thử Hạn mức Request Body (Mã lỗi HTTP 413)</h2>
+                    <p class="subtitle">Minh họa chỉ thị <code>client_max_body_size</code> (Mặc định: 1m -> Nâng lên:
+                        20m qua Hot Reload)</p>
+                </div>
+            </div>
+
+            <div class="two-col-grid">
+                <!-- Cột trái: Form Upload -->
+                <div class="card">
+                    <h3>1. Tải ảnh hoặc Payload lên Server</h3>
+                    <p class="card-desc">Gửi tới endpoint <code>POST /api/upload</code> qua NGINX Reverse Proxy.</p>
+
+                    <!-- Lựa chọn nhanh để test -->
+                    <div class="quick-payload-box">
+                        <label>Tạo Payload mẫu tự động:</label>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-outline" id="btn-gen-small">
+                                📄 Tạo file 500 KB (Hợp lệ &lt; 1MB)
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline btn-warning" id="btn-gen-large">
+                                💥 Tạo file 2.5 MB (Kích hoạt lỗi 413)
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="form-upload-image" class="upload-form">
+                        <div class="form-group">
+                            <label for="upload-file">Hoặc chọn tệp từ máy tính:</label>
+                            <input type="file" id="upload-file" accept="image/*,.bin,.dat">
+                            <span id="file-size-display" class="file-size-info">Chưa chọn tệp</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="upload-prod-id">Gán cho Mã Sản phẩm (ID):</label>
+                            <input type="number" id="upload-prod-id" placeholder="Tùy chọn: nhập ID sản phẩm (vd: 1)">
+                        </div>
+
+                        <button type="submit" class="btn btn-danger" id="btn-send-upload">
+                            <span>🚀 Gửi Request Upload</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Cột phải: Kết quả phản hồi & Hướng dẫn -->
+                <div class="card">
+                    <h3>2. Kết quả Phản hồi từ NGINX / Backend</h3>
+                    <div id="upload-status-box" class="upload-status-box empty">
+                        <p class="empty-text">Chưa gửi request. Hãy chọn file và bấm nút "Gửi Request Upload".</p>
+                    </div>
+
+                    <div class="hint-card">
+                        <h4>Quy trình thực hành Bước 5 (PDF):</h4>
+                        <ol>
+                            <li>Gửi file <b>2.5 MB</b> khi NGINX ở cấu hình mặc định (1m) &rarr; Nhận ngay <b>HTTP 413
+                                    Payload Too Large</b> từ NGINX.</li>
+                            <li>Sửa <code>default.conf</code>: thêm <code>client_max_body_size 20m;</code>.</li>
+                            <li>Chạy kiểm tra cú pháp: <code>docker compose exec proxy nginx -t</code>.</li>
+                            <li>Nạp nóng cấu hình: <code>docker compose exec proxy nginx -s reload</code>.</li>
+                            <li>Bấm gửi lại &rarr; Nhận <b>HTTP 200 OK</b>, ảnh lưu vào Shared Volume và hiển thị ngay
+                                lập tức!</li>
+                        </ol>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 4: CÂN BẰNG TẢI UPSTREAM NHIỀU BACKEND                     -->
+        <!-- ============================================================= -->
+        <section id="tab-cluster" class="tab-pane">
+            <div class="section-header">
+                <div>
+                    <h2>Kiểm chứng Cân bằng tải Upstream (Round-Robin)</h2>
+                    <p class="subtitle">Quan sát 2 Backend Instance (<code>api1:3000</code> và <code>api2:3000</code>)
+                        chia sẻ tải</p>
+                </div>
+            </div>
+
+            <div class="card cluster-card">
+                <div class="cluster-actions">
+                    <button id="btn-test-lb" class="btn btn-primary btn-lg">
+                        <span>⚡ Gửi liên tiếp 10 Request tới Upstream</span>
+                    </button>
+                    <button id="btn-reset-lb" class="btn btn-secondary">
+                        <span>Xóa lịch sử</span>
+                    </button>
+                </div>
+
+                <!-- Bảng đếm phân phối tải -->
+                <div class="cluster-stats-grid">
+                    <div class="stat-card" id="card-api1">
+                        <div class="stat-badge">Instance 1</div>
+                        <div class="stat-name">api1:3000</div>
+                        <div class="stat-count" id="count-api1">0</div>
+                        <div class="stat-percent" id="pct-api1">0%</div>
+                    </div>
+
+                    <div class="stat-card" id="card-api2">
+                        <div class="stat-badge">Instance 2</div>
+                        <div class="stat-name">api2:3000</div>
+                        <div class="stat-count" id="count-api2">0</div>
+                        <div class="stat-percent" id="pct-api2">0%</div>
+                    </div>
+
+                    <div class="stat-card total-card">
+                        <div class="stat-badge">Tổng số</div>
+                        <div class="stat-name">Requests</div>
+                        <div class="stat-count" id="count-total">0</div>
+                        <div class="stat-percent">Hoàn tất</div>
+                    </div>
+                </div>
+
+                <!-- Bảng nhật ký request tuần tự -->
+                <div class="log-table-container">
+                    <h3>Nhật ký tuần tự các Request đã gửi:</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Thời điểm</th>
+                                <th>Endpoint</th>
+                                <th>HTTP Status</th>
+                                <th>Backend Instance xử lý</th>
+                                <th>Thời gian phản hồi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lb-log-body">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Chưa có request nào được gửi. Bấm nút
+                                    phía trên để bắt đầu.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 5: SOI FORWARDED HEADERS & ĐỊA CHỈ IP                      -->
+        <!-- ============================================================= -->
+        <section id="tab-headers" class="tab-pane">
+            <div class="section-header">
+                <div>
+                    <h2>Kiểm tra Header Chuyển tiếp & Địa chỉ IP</h2>
+                    <p class="subtitle">Chứng minh địa chỉ IP thật của Client và cơ chế bảo toàn danh tính qua NGINX
+                        Reverse Proxy</p>
+                </div>
+                <button id="btn-inspect-headers" class="btn btn-primary">
+                    <span>🔍 Kiểm tra Headers Ngay</span>
+                </button>
+            </div>
+
+            <div class="two-col-grid">
+                <!-- Cột trái: Bảng giá trị Headers quan sát từ Backend -->
+                <div class="card">
+                    <h3>1. Giá trị Headers mà Backend nhận được</h3>
+                    <table class="headers-table">
+                        <tbody>
+                            <tr>
+                                <td><b>Peer Socket IP:</b><br><small
+                                        class="text-muted">(req.socket.remoteAddress)</small></td>
+                                <td><span id="hdr-peer-ip" class="ip-badge badge-nginx">Đang tải...</span><br>
+                                    <small class="text-muted">&rarr; Luôn là IP của container NGINX (172.x.x.x) trong
+                                        mạng Docker bridge</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>X-Real-IP:</b></td>
+                                <td><span id="hdr-x-real-ip" class="ip-badge badge-client">Đang tải...</span><br>
+                                    <small class="text-muted">&rarr; Địa chỉ IP thực của máy Client do NGINX gắn
+                                        vào</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><b>Host:</b></td>
+                                <td><span id="hdr-host" class="code-span">Đang tải...</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>X-Forwarded-For:</b></td>
+                                <td><span id="hdr-x-forwarded-for" class="code-span">Đang tải...</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>X-Forwarded-Proto:</b></td>
+                                <td><span id="hdr-x-forwarded-proto" class="code-span">Đang tải...</span></td>
+                            </tr>
+                            <tr>
+                                <td><b>Instance phản hồi:</b></td>
+                                <td><span id="hdr-instance-id" class="instance-badge">Đang tải...</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cột phải: Giải thích ý nghĩa và Cảnh báo bảo mật -->
+                <div class="card">
+                    <h3>2. Ý nghĩa Kỹ thuật & Cảnh báo Spoofing</h3>
+                    <div class="info-block">
+                        <h4>Tại sao Peer IP lại là 172.x.x.x?</h4>
+                        <p>Trong kiến trúc Docker bridge network, kết nối TCP tới Backend xuất phát từ chính container
+                            NGINX, nên socket IP luôn là IP container NGINX. Đó là lý do <b>bắt buộc</b> phải cấu hình
+                            <code>proxy_set_header X-Real-IP $remote_addr;</code>.</p>
+                    </div>
+
+                    <div class="info-block warning-block">
+                        <h4>Nguy cơ IP Spoofing & Quy tắc Trusted Proxies:</h4>
+                        <p>Kẻ tấn công có thể tự chèn <code>X-Forwarded-For</code> giả mạo. Backend chỉ được tin tưởng
+                            các header chuyển tiếp này khi request được gửi đến từ dải IP nội bộ đáng tin cậy của
+                            Reverse Proxy!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <!-- Academic Footer -->
     <footer class="app-footer">
-        <p>Báo cáo Bài tập lớn Hệ thống Server Nâng cao • Nhóm 7 • Hà Nội, tháng 10 năm 2026</p>
+        <div class="footer-inner">
+            <p>Dự án thực hành Buổi 8 • Nhóm 7 (Đại học Xây dựng Hà Nội - HUCE)</p>
+            <p>Hà Nội, tháng 10 năm 2026</p>
+        </div>
     </footer>
 
-    <script src="app.js"></script>
+    <!-- App JS -->
+    <script src="/app.js"></script>
 </body>
 
 </html>
