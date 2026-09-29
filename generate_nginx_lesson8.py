@@ -538,8 +538,8 @@ def build_presentation():
     tf_s2_r = tb_s2_r.text_frame
     tf_s2_r.word_wrap = True
     items_s2_r = [
-        ("Xây dựng Demo Độc lập:", "Tạo mới một ứng dụng demo gọn nhẹ: Frontend tĩnh, 2 backend Node.js (cổng 3000 trả instanceId), và NGINX Gateway (8080:80, 8443:443)."),
-        ("Cổng vào Tập trung (Single Entry):", "Định tuyến đường dẫn '/ ' về frontend tĩnh và '/api/ ' về backend, loại bỏ rào cản CORS nội bộ qua Same-Origin."),
+        ("Ứng dụng Quản lý Sản phẩm Mini:", "Xây dựng dự án chạy thật: Frontend tĩnh (SPA), 2 backend Node.js (api1 & api2 cổng 3000), CSDL PostgreSQL (db:5432), shared volume uploads và NGINX Gateway (8080:80, 8443:443)."),
+        ("Cổng vào Tập trung (Single Entry):", "Định tuyến đường dẫn '/' về frontend tĩnh và '/api/' về backend, loại bỏ rào cản CORS nội bộ qua Same-Origin."),
         ("Cân bằng tải & Kiểm chứng Thực hành:", "Cấu hình Upstream chia tải luân phiên, bảo vệ dung lượng body (413), nạp nóng cấu hình và thiết lập HTTPS tự ký có SAN.")
     ]
     for i, (h, b) in enumerate(items_s2_r):
@@ -557,7 +557,7 @@ def build_presentation():
 
     set_notes(slide2,
               "Nhấn mạnh rõ: Buổi 7 của Nhóm 6 đã phác thảo mô hình Docker Compose với Node.js cổng 3000 và NGINX ở mức sơ đồ. "
-              "Chúng ta coi đó là tài liệu tham chiếu lý thuyết. Trong Buổi 8 này, Nhóm 7 xây dựng một bộ demo độc lập, "
+              "Chúng ta coi đó là tài liệu tham chiếu lý thuyết. Trong Buổi 8 này, Nhóm 7 xây dựng một dự án hoàn chỉnh chạy thật: 'Quản lý sản phẩm mini' với PostgreSQL và shared volume ảnh, "
               "viết cấu hình thực tế cho NGINX và kiểm chứng từng bước bằng mã nguồn chạy được trong thư mục demo/.",
               "Giới thiệu lộ trình bài học: từ phục vụ file tĩnh, reverse proxy 1 backend, upstream 2 backend, giới hạn 413, tới HTTPS local.",
               "Tài liệu Buổi 8 PDF Mục 1 & Slide Nhóm 6 Buổi 7.")
@@ -693,7 +693,7 @@ def build_presentation():
     set_notes(slide4,
               "Nhấn mạnh với sinh viên: Cả 3 vai trò này đều có thể cấu hình đồng thời trên cùng một tiến trình NGINX duy nhất! "
               "Phân biệt Forward Proxy (đại diện cho client đi ra ngoài) và Reverse Proxy (đại diện cho server tiếp nhận client vào). "
-              "Trong bài thực hành, NGINX đảm nhận cả 3: vừa là web server phục vụ file frontend tĩnh, vừa là reverse proxy cho /api/, vừa cân bằng tải upstream giữa backend1 và backend2.",
+              "Trong bài thực hành, NGINX đảm nhận cả 3: vừa là web server phục vụ file frontend tĩnh, vừa là reverse proxy cho /api/, vừa cân bằng tải upstream giữa api1 và api2.",
               "Vẽ mô hình so sánh vị trí của 3 thành phần trên hệ thống minh họa.",
               "Tài liệu Buổi 8 PDF, Mục 1.1 và 1.2.")
 
@@ -842,7 +842,7 @@ def build_presentation():
     tb_be = slide6.shapes.add_textbox(be_left + Inches(0.15), be_top + Inches(0.2), be_w - Inches(0.3), be_h - Inches(0.4))
     tb_be.text_frame.word_wrap = True
     p = tb_be.text_frame.paragraphs[0]
-    p.text = "UPSTREAM CLUSTER\nbackend1:3000 (Node.js)\nbackend2:3000 (Node.js)\n(GET /api/products)"
+    p.text = "UPSTREAM CLUSTER\napi1:3000 (Node.js)\napi2:3000 (Node.js)\n(GET /api/products)"
     p.font.name = FONT_HEADING
     p.font.size = Pt(13)
     p.font.bold = True
@@ -865,7 +865,7 @@ def build_presentation():
               "Slide này minh họa trực quan luồng đi của 1 request: "
               "1. Client chỉ biết duy nhất 1 địa chỉ máy chủ: myapp.local:8080. "
               "2. NGINX phân tích tiền tố URI: Nếu là / -> Đọc file tĩnh trên đĩa trả về ngay. "
-              "3. Nếu là /api/... -> NGINX ủy quyền (proxy_pass) sang cụm upstream backend1/backend2 ở cổng 3000.",
+              "3. Nếu là /api/... -> NGINX ủy quyền (proxy_pass) sang cụm upstream api1/api2 ở cổng 3000.",
               "Trình bày chi tiết luồng dữ liệu 2 nhánh: File tĩnh và API nghiệp vụ.",
               "Tài liệu Buổi 8 PDF, Mục 2: Cấu hình Reverse Proxy.")
 
@@ -1073,16 +1073,16 @@ def build_presentation():
 
     add_demo_box(slide10, Inches(0.8), Inches(4.85), Inches(11.733), Inches(1.92),
                  2, "Reverse Proxy cho FE + BE & Kiểm chứng Same-Origin",
-                 "Từ giao diện frontend, bấm nút 'Tải danh sách sản phẩm' gọi API 'GET /api/products'. Đồng thời kiểm tra log trong container backend.",
-                 "Dữ liệu danh sách sản phẩm trả về dạng JSON hiển thị lên bảng giao diện; Console không có lỗi CORS; Backend ghi nhận request và log header.",
+                 "Frontend gọi API 'GET /api/products' và 'POST /api/products' qua NGINX. Backend đọc/ghi dữ liệu vào PostgreSQL thật và trả kết quả kèm instanceId.",
+                 "Dữ liệu sản phẩm trả về JSON hiển thị trên giao diện; Thêm mới sản phẩm lưu thành công vào CSDL; Console không bị lỗi CORS; Log backend ghi nhận request.",
                  "Chứng minh NGINX định tuyến path '/api/' vào backend thông suốt, tạo môi trường Same-Origin giúp luồng gọi API nội bộ không bị rào cản CORS.")
 
     set_notes(slide10,
               "Bước 2 trong Section 3 PDF: Reverse Proxy ghép cặp Frontend và 1 Backend API. "
-              "Lưu ý quan trọng: API dùng trong bài là tính năng dữ liệu nghiệp vụ thật '/api/products' (Node.js cổng 3000), không phải mock đơn giản. "
+              "Lưu ý quan trọng: Ứng dụng Quản lý Sản phẩm Mini cung cấp CRUD thật lưu trong CSDL PostgreSQL (db:5432) qua kiến trúc Controller - Service - Repository. "
               "Giải thích kỹ: Same-Origin giúp tránh lỗi CORS cho luồng gọi nội bộ giữa FE và BE, nhưng nếu có ứng dụng bên ngoài gọi vào thì vẫn phải áp dụng chính sách CORS. "
               "Quy tắc dấu slash: Nếu viết proxy_pass http://backend_cluster/ (có slash cuối), NGINX sẽ cắt bỏ /api/ và chỉ gửi /products tới backend.",
-              "Thao tác demo: Bấm nút load sản phẩm trên giao diện, mở Network tab xem status 200 tại /api/products cùng origin.",
+              "Thao tác demo: Mở giao diện web, xem danh sách sản phẩm từ DB, thêm thử sản phẩm mới và mở F12 Network tab xem status 200/201 tại cùng origin.",
               "Tài liệu Buổi 8 PDF, Mục 3 - Bước 2.")
 
     # ==========================================================================
@@ -1099,7 +1099,7 @@ def build_presentation():
     add_card(slide11, Inches(0.8), Inches(2.25), h_w, h_h, "proxy_set_header Host $host;")
     tb_h1 = slide11.shapes.add_textbox(Inches(1.0), Inches(2.8), h_w - Inches(0.4), Inches(1.5))
     tb_h1.text_frame.word_wrap = True
-    tb_h1.text_frame.paragraphs[0].text = "• Ý nghĩa: Giữ nguyên tên miền gốc mà client gõ trên thanh địa chỉ (vd: 'myapp.local:8080').\n• Nếu thiếu: Backend nhận tên server nội bộ (vd: 'backend1:3000') khiến các đường link tuyệt đối do backend tự sinh bị sai lệch hoàn toàn."
+    tb_h1.text_frame.paragraphs[0].text = "• Ý nghĩa: Giữ nguyên tên miền gốc mà client gõ trên thanh địa chỉ (vd: 'myapp.local:8080').\n• Nếu thiếu: Backend nhận tên server nội bộ (vd: 'api1:3000') khiến các đường link tuyệt đối do backend tự sinh bị sai lệch hoàn toàn."
     tb_h1.text_frame.paragraphs[0].font.size = Pt(13.5)
     tb_h1.text_frame.paragraphs[0].font.color.rgb = COLOR_TEXT_DARK
 
@@ -1145,8 +1145,8 @@ def build_presentation():
     code_s12 = [
         "upstream backend_cluster {",
         "    # Thuật toán mặc định: Round-Robin",
-        "    server backend1:3000 max_fails=3 fail_timeout=10s;",
-        "    server backend2:3000 max_fails=3 fail_timeout=10s;",
+        "    server api1:3000 max_fails=3 fail_timeout=10s;",
+        "    server api2:3000 max_fails=3 fail_timeout=10s;",
         "    # least_conn;  # Cân bằng ít kết nối nhất",
         "}"
     ]
@@ -1161,7 +1161,7 @@ def build_presentation():
     tf_s12_r = tb_s12_r.text_frame
     tf_s12_r.word_wrap = True
     c12_desc = [
-        ("Thuật toán Round-Robin:", "Mặc định phân phối tuần tự giữa backend1 và backend2. Trong thực tế, tỷ lệ có thể không chia đều 50/50 tuyệt đối do HTTP Keep-Alive hoặc browser prefetch."),
+        ("Thuật toán Round-Robin:", "Mặc định phân phối tuần tự giữa api1 và api2. Trong thực tế, tỷ lệ có thể không chia đều 50/50 tuyệt đối do HTTP Keep-Alive hoặc browser prefetch."),
         ("Lưu ý High Availability (HA):", "Cụm 2 backend giúp chia tải và loại bỏ SPOF ở tầng backend, nhưng toàn hệ thống chưa đạt HA toàn diện vì chỉ có duy nhất 1 NGINX Gateway đóng vai trò SPOF.")
     ]
     for k, v in c12_desc:
@@ -1177,8 +1177,8 @@ def build_presentation():
 
     add_demo_box(slide12, Inches(0.8), Inches(4.85), Inches(11.733), Inches(1.92),
                  3, "Upstream Cân bằng tải qua nhiều Backend Instance",
-                 "Khởi chạy song song 2 instance backend (backend1:3000, backend2:3000) trong compose.yaml. Gửi liên tiếp 10 request 'GET /api/products'.",
-                 "Dữ liệu phản hồi mang trường 'instanceId' luân phiên giữa backend-1 và backend-2, chứng minh tải được phân phối đều giữa 2 node.",
+                 "Khởi chạy song song 2 instance backend (api1:3000, api2:3000) trong compose.yaml. Gửi liên tiếp 10 request 'GET /api/products'.",
+                 "Dữ liệu phản hồi mang trường 'instanceId' luân phiên giữa api1 và api2, chứng minh tải được phân phối đều giữa 2 node.",
                  "Chứng minh cơ chế Upstream của NGINX tự động phân phối tải và tăng cường năng lực phục vụ cho hệ thống backend.")
 
     set_notes(slide12,
@@ -1186,7 +1186,7 @@ def build_presentation():
               "Giải thích thuật toán: Round-Robin là mặc định. Ngoài ra có least_conn (thích hợp request thời gian xử lý lệch nhau) và ip_hash (session persistence). "
               "Lưu ý kỹ thuật chính xác: Hai backend giúp tránh chết toàn hệ thống khi 1 backend crash. Tuy nhiên, NGINX hiện vẫn là Single Point of Failure (SPOF). "
               "Trên thực tế muốn HA toàn diện cần chạy 2 NGINX kết hợp Keepalived (VRRP) chia sẻ Virtual IP.",
-              "Thao tác demo: Bấm nút 'Gửi liên tiếp 10 request' trên giao diện web, quan sát bộ đếm backend-1 và backend-2 tăng đều.",
+              "Thao tác demo: Bấm nút 'Gửi liên tiếp 10 request' trên giao diện web, quan sát bộ đếm api1 và api2 tăng đều.",
               "Tài liệu Buổi 8 PDF, Mục 3 - Bước 3.")
 
     # ==========================================================================
@@ -1202,8 +1202,8 @@ def build_presentation():
     tf_s13_l.word_wrap = True
     c13_l = [
         ("Mạng Cầu nối Mặc định (Bridge):", "Docker Compose tự động khởi tạo mạng bridge (ví dụ: 'app_net') liên kết các container trong cùng stack."),
-        ("DNS Nội bộ Docker (127.0.0.11):", "Mỗi service name ('backend1', 'backend2', 'proxy') tự động được phân giải thành địa chỉ IP nội bộ của container tương ứng."),
-        ("Định tuyến bằng Service Name:", "NGINX chỉ cần cấu hình 'server backend1:3000;' mà không cần quan tâm IP nội bộ có thay đổi sau mỗi lần khởi động lại."),
+        ("DNS Nội bộ Docker (127.0.0.11):", "Mỗi service name ('api1', 'api2', 'db', 'proxy') tự động được phân giải thành địa chỉ IP nội bộ của container tương ứng."),
+        ("Định tuyến bằng Service Name:", "NGINX chỉ cần cấu hình 'server api1:3000;' mà không cần quan tâm IP nội bộ có thay đổi sau mỗi lần khởi động lại."),
         ("Mã cổng nội bộ 3000:", "Chỉ cần lệnh 'expose: 3000' trong compose.yaml, không cần mở 'ports:' ra máy host, giúp bảo vệ an toàn cho backend.")
     ]
     for k, v in c13_l:
@@ -1242,7 +1242,7 @@ def build_presentation():
               "Dùng localhost trong nginx.conf để gọi backend -> bị lỗi 502 Bad Gateway. "
               "Giải thích rõ: Container NGINX và container Backend là 2 máy ảo logic khác nhau trên mạng bridge. "
               "Docker tích hợp sẵn DNS server nội bộ tại IP 127.0.0.11 để giải quyết bài toán Service Discovery này.",
-              "Thao tác demo: Vào container NGINX chạy 'nslookup backend1' để chứng minh Docker DNS phân giải IP 172.x.x.x.",
+              "Thao tác demo: Vào container NGINX chạy 'nslookup api1' để chứng minh Docker DNS phân giải IP 172.x.x.x.",
               "Docker Compose Networking Reference.")
 
     # ==========================================================================
@@ -1254,8 +1254,8 @@ def build_presentation():
 
     code_s14 = [
         "upstream backend_cluster {",
-        "    server backend1:3000 max_fails=3 fail_timeout=10s;",
-        "    server backend2:3000 max_fails=3 fail_timeout=10s;",
+        "    server api1:3000 max_fails=3 fail_timeout=10s;",
+        "    server api2:3000 max_fails=3 fail_timeout=10s;",
         "}",
         "server {",
         "    listen 80;",
@@ -1681,7 +1681,7 @@ def build_presentation():
         ("BƯỚC DEMO", "NỘI DUNG CẤU HÌNH KIỂM CHỨNG", "KẾT QUẢ DỰ KIẾN / THỰC TẾ"),
         ("Bước 1", "NGINX làm Web Server (root & index)", "Tải thành công frontend tĩnh, HTTP 200 OK trang chủ."),
         ("Bước 2", "Reverse Proxy FE + BE (location /api/)", "Gọi API cùng origin, tránh lỗi CORS, backend nhận X-Real-IP."),
-        ("Bước 3", "Upstream cân bằng tải 2 backend", "Request phân phối luân phiên Round-robin qua backend1 và backend2."),
+        ("Bước 3", "Upstream cân bằng tải 2 backend", "Request phân phối luân phiên Round-robin qua api1 và api2."),
         ("Bước 4", "Mạng Docker Compose & Service Discovery", "NGINX trỏ tới backend bằng Service Name nội bộ cổng 3000."),
         ("Bước 5", "Giới hạn Request Body & Hot Reload", "Bắt lỗi HTTP 413, thêm client_max_body_size 20m, reload thành công."),
         ("Bước 6", "Giả lập Domain & Cấu hình HTTPS", "Ánh xạ hosts, SSL tự ký có SAN, giải thích cảnh báo bảo mật.")
