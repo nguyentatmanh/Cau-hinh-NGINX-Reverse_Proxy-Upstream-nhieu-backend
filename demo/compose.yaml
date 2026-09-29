@@ -1,5 +1,5 @@
 # ==============================================================================
-# DOCKER COMPOSE CHO DỰ ÁN QUẢN LÝ SẢN PHẨM MINI - BUỔI 8 (NHÓM 7)
+# DOCKER COMPOSE CHO DỰ ÁN HUCE LEARNING STORE - BUỔI 8 (NHÓM 8)
 # Trường Đại học Xây dựng Hà Nội (HUCE)
 # Kiến trúc: NGINX Gateway -> [api1:3000, api2:3000] -> PostgreSQL (db:5432)
 # Shared Volumes: pg_data (lưu trữ CSDL), uploads_data (lưu trữ ảnh dùng chung)
