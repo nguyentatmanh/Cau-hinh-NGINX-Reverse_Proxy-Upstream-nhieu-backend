@@ -6,9 +6,9 @@ CHƯƠNG TRÌNH TỰ ĐỘNG SINH BÀI THUYẾT TRÌNH BÁO CÁO HỆ THỐNG SE
 HỌC PHẦN: HỆ THỐNG SERVER NÂNG CAO - KHOA CÔNG NGHỆ THÔNG TIN
 ĐƠN VỊ: TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI (HUCE)
 CHUYÊN ĐỀ: BUỔI 8 - CẤU HÌNH NGINX REVERSE PROXY – UPSTREAM NHIỀU BACKEND
-NHÓM THỰC HIỆN: NHÓM 7
+NHÓM THỰC HIỆN: NHÓM 8
 ================================================================================
-Thành viên Nhóm 7:
+Thành viên Nhóm 8:
   1. 0210668 - Nguyễn Đức Mạnh
   2. 0210768 - Nguyễn Tất Mạnh
   3. 0214268 - Đỗ Công Trí
@@ -90,7 +90,7 @@ def add_academic_frame(slide, slide_num, total_slides=TOTAL_SLIDES):
     """
     Tạo khung header & footer học thuật chuẩn mực trên MỌI slide nội dung (từ slide 2 đến 20):
       - Header: Logo chính thức HUCE (bảo toàn tỷ lệ) + tên 'TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI'
-      - Footer: 'Hà Nội, tháng 10 năm 2026' + Tên chuyên đề Nhóm 7 + Số trang 'Trang XX / 20'
+      - Footer: 'Hà Nội, tháng 10 năm 2026' + Tên chuyên đề Nhóm 8 + Số trang 'Trang XX / 20'
     """
     # 1. Logo chính thức HUCE góc trên bên trái
     logo_h = Inches(0.68)
@@ -139,12 +139,12 @@ def add_academic_frame(slide, slide_num, total_slides=TOTAL_SLIDES):
     p_fl.font.size = Pt(10)
     p_fl.font.color.rgb = COLOR_TEXT_MUTED
 
-    # Cột giữa: Tên chuyên đề Nhóm 7
+    # Cột giữa: Tên chuyên đề Nhóm 8
     tb_fc = slide.shapes.add_textbox(Inches(4.5), Inches(6.98), Inches(4.8), Inches(0.35))
     tf_fc = tb_fc.text_frame
     tf_fc.margin_left = tf_fc.margin_top = tf_fc.margin_right = tf_fc.margin_bottom = 0
     p_fc = tf_fc.paragraphs[0]
-    p_fc.text = "Nhóm 7 • NGINX Reverse Proxy & Upstream nhiều Backend"
+    p_fc.text = "Nhóm 8 • NGINX Reverse Proxy & Upstream nhiều Backend"
     p_fc.font.name = FONT_BODY
     p_fc.font.size = Pt(9.5)
     p_fc.font.color.rgb = COLOR_TEXT_MUTED
@@ -368,7 +368,7 @@ def set_notes(slide, explanation, demo_action="", asset_sources=""):
 # HÀM CHÍNH SINH TOÀN BỘ 20 SLIDE BÀI GIẢNG BUỔI 8
 # ==============================================================================
 def build_presentation():
-    print("Bắt đầu sinh 20 slide bài giảng NGINX Buổi 8 (Nhóm 7 - HUCE)...")
+    print("Bắt đầu sinh 20 slide bài giảng NGINX Buổi 8 (Nhóm 8 - HUCE)...")
 
     prs = Presentation()
     prs.slide_width = Inches(13.333)
@@ -376,7 +376,7 @@ def build_presentation():
     blank_layout = prs.slide_layouts[6]
 
     # ==========================================================================
-    # SLIDE 01: TRANG BÌA NHÓM 7
+    # SLIDE 01: TRANG BÌA NHÓM 8
     # ==========================================================================
     slide1 = prs.slides.add_slide(blank_layout)
 
@@ -414,7 +414,7 @@ def build_presentation():
     p_u2.font.size = Pt(12)
     p_u2.font.color.rgb = COLOR_TEXT_MUTED
 
-    # Tiêu đề bài thuyết trình: BUỔI 8 - CẤU HÌNH NGINX REVERSE PROXY – UPSTREAM NHIỀU BACKEND - NHÓM 7
+    # Tiêu đề bài thuyết trình: BUỔI 8 - CẤU HÌNH NGINX REVERSE PROXY – UPSTREAM NHIỀU BACKEND - NHÓM 8
     tb_title = slide1.shapes.add_textbox(Inches(1.2), Inches(2.1), Inches(11.0), Inches(2.2))
     tf_t = tb_title.text_frame
     tf_t.word_wrap = True
@@ -436,13 +436,13 @@ def build_presentation():
     p_maintitle.space_after = Pt(2)
 
     p_grp = tf_t.add_paragraph()
-    p_grp.text = "NHÓM 7"
+    p_grp.text = "NHÓM 8"
     p_grp.font.name = FONT_HEADING
     p_grp.font.size = Pt(20)
     p_grp.font.bold = True
     p_grp.font.color.rgb = COLOR_ACCENT
 
-    # Bảng danh sách 4 thành viên Nhóm 7 (chính xác 100% MSSV và họ tên)
+    # Bảng danh sách 4 thành viên Nhóm 8 (chính xác 100% MSSV và họ tên)
     table_shape = slide1.shapes.add_table(5, 2, Inches(1.2), Inches(4.55), Inches(6.5), Inches(1.95))
     table = table_shape.table
     table.columns[0].width = Inches(2.2)
@@ -498,9 +498,9 @@ def build_presentation():
     p_l2.font.color.rgb = COLOR_TEXT_MUTED
 
     set_notes(slide1,
-              "Chào mừng Thầy và các bạn đến với buổi báo cáo chuyên đề Buổi 8 của Nhóm 7. "
+              "Chào mừng Thầy và các bạn đến với buổi báo cáo chuyên đề Buổi 8 của Nhóm 8. "
               "Chủ đề hôm nay tập trung vào: Cấu hình NGINX Reverse Proxy và Upstream nhiều backend. "
-              "Nhóm 7 gồm 4 thành viên: Nguyễn Đức Mạnh, Nguyễn Tất Mạnh, Đỗ Công Trí, Nguyễn Huy Hoàng.",
+              "Nhóm 8 gồm 4 thành viên: Nguyễn Đức Mạnh, Nguyễn Tất Mạnh, Đỗ Công Trí, Nguyễn Huy Hoàng.",
               "Chiếu trang bìa, giới thiệu thành viên và chủ đề báo cáo.",
               "Logo HUCE trích xuất chính thức từ https://huce.edu.vn/he-thong-nhan-dien.")
 
@@ -517,7 +517,7 @@ def build_presentation():
     tf_s2_l.word_wrap = True
     items_s2_l = [
         ("Mô hình tham chiếu Buổi 7:", "Slide Nhóm 6 đã giới thiệu Docker Compose, 2 backend Node.js cổng 3000 và NGINX cổng 8080 ở mức sơ đồ kiến trúc."),
-        ("Bản chất tài liệu tham chiếu:", "Slide Nhóm 6 là tài liệu tham chiếu kiến trúc, không phải bằng chứng Nhóm 7 đang sở hữu một ứng dụng chạy sẵn từ trước."),
+        ("Bản chất tài liệu tham chiếu:", "Slide Nhóm 6 là tài liệu tham chiếu kiến trúc, không phải bằng chứng Nhóm 8 đang sở hữu một ứng dụng chạy sẵn từ trước."),
         ("Vấn đề cần giải quyết:", "Các backend chạy độc lập, chưa có cấu hình định tuyến chi tiết, chưa có kiểm chứng thực tế bằng cấu hình NGINX và đo kiểm trực tiếp.")
     ]
     for i, (h, b) in enumerate(items_s2_l):
@@ -538,7 +538,7 @@ def build_presentation():
     tf_s2_r = tb_s2_r.text_frame
     tf_s2_r.word_wrap = True
     items_s2_r = [
-        ("Ứng dụng Quản lý Sản phẩm Mini:", "Xây dựng dự án chạy thật: Frontend tĩnh (SPA), 2 backend Node.js (api1 & api2 cổng 3000), CSDL PostgreSQL (db:5432), shared volume uploads và NGINX Gateway (8080:80, 8443:443)."),
+        ("HUCE Learning Store (Sách & Khóa học):", "Xây dựng dự án chạy thật: Frontend tĩnh (SPA), 2 backend Node.js (api1 & api2 cổng 3000), CSDL PostgreSQL (db:5432) lưu sách, khóa học và đơn hàng thật, shared volume uploads và NGINX Gateway (8080:80, 8443:443)."),
         ("Cổng vào Tập trung (Single Entry):", "Định tuyến đường dẫn '/' về frontend tĩnh và '/api/' về backend, loại bỏ rào cản CORS nội bộ qua Same-Origin."),
         ("Cân bằng tải & Kiểm chứng Thực hành:", "Cấu hình Upstream chia tải luân phiên, bảo vệ dung lượng body (413), nạp nóng cấu hình và thiết lập HTTPS tự ký có SAN.")
     ]
@@ -557,7 +557,7 @@ def build_presentation():
 
     set_notes(slide2,
               "Nhấn mạnh rõ: Buổi 7 của Nhóm 6 đã phác thảo mô hình Docker Compose với Node.js cổng 3000 và NGINX ở mức sơ đồ. "
-              "Chúng ta coi đó là tài liệu tham chiếu lý thuyết. Trong Buổi 8 này, Nhóm 7 xây dựng một dự án hoàn chỉnh chạy thật: 'Quản lý sản phẩm mini' với PostgreSQL và shared volume ảnh, "
+              "Chúng ta coi đó là tài liệu tham chiếu lý thuyết. Trong Buổi 8 này, Nhóm 8 xây dựng một dự án hoàn chỉnh chạy thật: 'HUCE Learning Store' (Cửa hàng học liệu & khóa học công nghệ) với PostgreSQL và shared volume ảnh uploads_data, "
               "viết cấu hình thực tế cho NGINX và kiểm chứng từng bước bằng mã nguồn chạy được trong thư mục demo/.",
               "Giới thiệu lộ trình bài học: từ phục vụ file tĩnh, reverse proxy 1 backend, upstream 2 backend, giới hạn 413, tới HTTPS local.",
               "Tài liệu Buổi 8 PDF Mục 1 & Slide Nhóm 6 Buổi 7.")
@@ -842,7 +842,7 @@ def build_presentation():
     tb_be = slide6.shapes.add_textbox(be_left + Inches(0.15), be_top + Inches(0.2), be_w - Inches(0.3), be_h - Inches(0.4))
     tb_be.text_frame.word_wrap = True
     p = tb_be.text_frame.paragraphs[0]
-    p.text = "UPSTREAM CLUSTER\napi1:3000 (Node.js)\napi2:3000 (Node.js)\n(GET /api/products)"
+    p.text = "UPSTREAM CLUSTER\napi1:3000 (Node.js)\napi2:3000 (Node.js)\n(GET /api/products, POST /api/orders)"
     p.font.name = FONT_HEADING
     p.font.size = Pt(13)
     p.font.bold = True
@@ -855,8 +855,8 @@ def build_presentation():
     tf_sub = tb_sub.text_frame
     tf_sub.word_wrap = True
     p_sub = tf_sub.paragraphs[0]
-    p_sub.text = "Ví dụ URL thực tế: Người dùng mở 'http://myapp.local:8080/' -> NGINX trả giao diện index.html. " \
-                 "JavaScript gọi ngầm 'http://myapp.local:8080/api/products' -> NGINX chuyển tiếp tới 'http://backend_cluster/api/products' tại cổng nội bộ 3000."
+    p_sub.text = "Ví dụ URL thực tế: Người dùng mở 'http://myapp.local:8080/' -> NGINX trả giao diện HUCE Learning Store. " \
+                 "JavaScript gọi ngầm 'http://myapp.local:8080/api/products' hoặc tạo đơn hàng -> NGINX chuyển tiếp tới 'http://backend_cluster/api/...' tại cổng nội bộ 3000."
     p_sub.font.name = FONT_BODY
     p_sub.font.size = Pt(13.5)
     p_sub.font.color.rgb = COLOR_PRIMARY
@@ -1073,16 +1073,16 @@ def build_presentation():
 
     add_demo_box(slide10, Inches(0.8), Inches(4.85), Inches(11.733), Inches(1.92),
                  2, "Reverse Proxy cho FE + BE & Kiểm chứng Same-Origin",
-                 "Frontend gọi API 'GET /api/products' và 'POST /api/products' qua NGINX. Backend đọc/ghi dữ liệu vào PostgreSQL thật và trả kết quả kèm instanceId.",
-                 "Dữ liệu sản phẩm trả về JSON hiển thị trên giao diện; Thêm mới sản phẩm lưu thành công vào CSDL; Console không bị lỗi CORS; Log backend ghi nhận request.",
+                 "Frontend gọi API 'GET /api/products' (lấy danh mục sách/khóa học) và 'POST /api/orders' (đặt hàng) qua NGINX. Backend đọc/ghi dữ liệu vào PostgreSQL thật và trả kết quả kèm instanceId.",
+                 "Dữ liệu học liệu trả về JSON hiển thị trên storefront; Đơn hàng lưu thành công vào CSDL; Console không bị lỗi CORS; Log backend ghi nhận request.",
                  "Chứng minh NGINX định tuyến path '/api/' vào backend thông suốt, tạo môi trường Same-Origin giúp luồng gọi API nội bộ không bị rào cản CORS.")
 
     set_notes(slide10,
               "Bước 2 trong Section 3 PDF: Reverse Proxy ghép cặp Frontend và 1 Backend API. "
-              "Lưu ý quan trọng: Ứng dụng Quản lý Sản phẩm Mini cung cấp CRUD thật lưu trong CSDL PostgreSQL (db:5432) qua kiến trúc Controller - Service - Repository. "
+              "Lưu ý quan trọng: Ứng dụng HUCE Learning Store cung cấp dữ liệu sách và khóa học thật lưu trong CSDL PostgreSQL (db:5432) qua kiến trúc Controller - Service - Repository. "
               "Giải thích kỹ: Same-Origin giúp tránh lỗi CORS cho luồng gọi nội bộ giữa FE và BE, nhưng nếu có ứng dụng bên ngoài gọi vào thì vẫn phải áp dụng chính sách CORS. "
               "Quy tắc dấu slash: Nếu viết proxy_pass http://backend_cluster/ (có slash cuối), NGINX sẽ cắt bỏ /api/ và chỉ gửi /products tới backend.",
-              "Thao tác demo: Mở giao diện web, xem danh sách sản phẩm từ DB, thêm thử sản phẩm mới và mở F12 Network tab xem status 200/201 tại cùng origin.",
+              "Thao tác demo: Mở giao diện web, xem danh mục sách và khóa học từ DB, thêm vào giỏ và đặt hàng, mở F12 Network tab xem status 200/201 tại cùng origin.",
               "Tài liệu Buổi 8 PDF, Mục 3 - Bước 2.")
 
     # ==========================================================================
@@ -1177,8 +1177,8 @@ def build_presentation():
 
     add_demo_box(slide12, Inches(0.8), Inches(4.85), Inches(11.733), Inches(1.92),
                  3, "Upstream Cân bằng tải qua nhiều Backend Instance",
-                 "Khởi chạy song song 2 instance backend (api1:3000, api2:3000) trong compose.yaml. Gửi liên tiếp 10 request 'GET /api/products'.",
-                 "Dữ liệu phản hồi mang trường 'instanceId' luân phiên giữa api1 và api2, chứng minh tải được phân phối đều giữa 2 node.",
+                 "Khởi chạy song song 2 instance backend (api1:3000, api2:3000) trong compose.yaml. Gửi liên tiếp 10 request 'GET /api/products' hoặc tạo đơn hàng.",
+                 "Dữ liệu phản hồi mang header X-Backend-Instance và trường 'instanceId' luân phiên giữa api1 và api2, chứng minh tải được phân phối đều.",
                  "Chứng minh cơ chế Upstream của NGINX tự động phân phối tải và tăng cường năng lực phục vụ cho hệ thống backend.")
 
     set_notes(slide12,
@@ -1351,8 +1351,8 @@ def build_presentation():
 
     add_demo_box(slide15, Inches(0.8), Inches(4.85), Inches(11.733), Inches(1.92),
                  5, "Bắt lỗi 413, Nâng hạn mức Body & Nạp nóng Cấu hình",
-                 "Gửi payload 2 MB tới endpoint 'POST /api/upload' khi NGINX ở cấu hình mặc định (1m). Quan sát lỗi 413. Sửa 'client_max_body_size 20m;', chạy 'nginx -t', reload và gửi lại.",
-                 "Lần 1 nhận chính xác HTTP 413 Payload Too Large. Lần 2 sau khi reload cấu hình nóng, upload thành công nhận mã HTTP 200 OK.",
+                 "Gửi ảnh bìa 1.34 MB tới 'POST /api/products/1/image' khi NGINX ở cấu hình mặc định (1m). Quan sát lỗi 413. Nâng 'client_max_body_size 20m;', chạy 'nginx -t', reload và gửi lại.",
+                 "Lần 1 nhận chính xác HTTP 413 Payload Too Large. Lần 2 sau khi reload cấu hình nóng, upload thành công nhận mã HTTP 200 OK và ảnh lưu vào uploads_data.",
                  "Chứng minh tính năng kiểm soát dung lượng request của NGINX và khả năng nạp nóng cấu hình không làm gián đoạn dịch vụ (Zero-Downtime Reload).")
 
     set_notes(slide15,
@@ -1360,7 +1360,7 @@ def build_presentation():
               "Nhấn mạnh chính xác về mặt kỹ thuật: client_max_body_size là cơ chế kiểm soát tài nguyên bộ nhớ/đĩa đệm và chống DoS, không phải cơ chế chống tràn bộ đệm (buffer overflow). "
               "Quy trình reload của NGINX: Master process nhận tín hiệu HUP (-s reload), kiểm tra lại cú pháp, khởi tạo worker pool mới phục vụ các request mới, "
               "đồng thời gửi tín hiệu QUIT cho worker cũ để phục vụ nốt các kết nối đang dang dở rồi mới kết thúc an toàn.",
-              "Thao tác demo: Chọn payload 2 MB trên giao diện, bấm Upload nhận mã 413. Sau đó sửa default.conf thành 20m, chạy lệnh reload trong terminal và bấm lại nút Upload nhận mã 200 OK.",
+              "Thao tác demo: Chọn file ảnh mẫu 1.34 MB trên giao diện, bấm Upload nhận mã 413. Sau đó chuyển stage 5 (20m), reload và bấm lại nút Upload nhận mã 200 OK.",
               "Tài liệu Buổi 8 PDF, Mục 3 - Bước 5.")
 
     # ==========================================================================
@@ -1726,7 +1726,7 @@ def build_presentation():
     p_c1.font.size = Pt(13)
     p_c1.font.color.rgb = COLOR_TEXT_DARK
     p_c2 = tf_c.add_paragraph()
-    p_c2.text = "Nhóm 7 xin trân trọng cảm ơn Thầy và các bạn đã chú ý lắng nghe bài báo cáo!"
+    p_c2.text = "Nhóm 8 xin trân trọng cảm ơn Thầy và các bạn đã chú ý lắng nghe bài báo cáo!"
     p_c2.font.name = FONT_HEADING
     p_c2.font.size = Pt(13.5)
     p_c2.font.bold = True
@@ -1741,15 +1741,15 @@ def build_presentation():
     # ==========================================================================
     # LƯU FILE BÀI THUYẾT TRÌNH POWERPOINT
     # ==========================================================================
-    out_path_7 = os.path.join(SCRIPT_DIR, "NGINX_Buoi_8_Nhom_7.pptx")
     out_path_8 = os.path.join(SCRIPT_DIR, "NGINX_Buoi_8_Nhom_8.pptx")
+    out_path_7 = os.path.join(SCRIPT_DIR, "NGINX_Buoi_8_Nhom_7.pptx")
 
-    prs.save(out_path_7)
-    # Lưu đồng thời cả hai tên file để tương thích tuyệt đối với mọi kịch bản chấm bài
     prs.save(out_path_8)
+    # Lưu đồng thời cả hai tên file để tương thích tuyệt đối với mọi kịch bản chấm bài
+    prs.save(out_path_7)
 
-    print(f"✔ Đã tạo thành công bài thuyết trình PowerPoint: '{out_path_7}'")
-    print(f"✔ Đã sao lưu tương thích: '{out_path_8}'")
+    print(f"✔ Đã tạo thành công bài thuyết trình PowerPoint: '{out_path_8}'")
+    print(f"✔ Đã sao lưu tương thích: '{out_path_7}'")
     print(f"Tổng số slide: {len(prs.slides)}")
 
 
