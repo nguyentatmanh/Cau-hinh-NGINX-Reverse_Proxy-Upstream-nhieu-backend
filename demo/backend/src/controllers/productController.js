@@ -1,15 +1,17 @@
 /**
- * controllers/productController.js - Tầng Điều khiển (Controller)
- * Xử lý request, response, thiết lập mã trạng thái và trả kèm instanceId
+ * controllers/productController.js - Tầng Điều khiển Sản phẩm (Sách & Khóa học)
+ * Xử lý danh mục, tìm kiếm, lọc, tạo mới, chỉnh sửa thông tin và thay ảnh bìa
  */
 const productService = require('../services/productService');
+const { checkDbHealth } = require('../config/db');
 
 function createProductController(instanceId) {
     return {
-        // GET /api/products
+        // GET /api/products?type=book|course&search=...
         async getProducts(req, res) {
             try {
-                const products = await productService.getAllProducts();
+                const { type, search } = req.query;
+                const products = await productService.getAllProducts({ type, search });
                 return res.status(200).json({
                     success: true,
                     instanceId,
@@ -18,7 +20,7 @@ function createProductController(instanceId) {
                     serverTime: new Date().toISOString()
                 });
             } catch (err) {
-                return res.status(500).json({
+                return res.status(err.statusCode || 500).json({
                     success: false,
                     instanceId,
                     error: err.message
@@ -47,17 +49,11 @@ function createProductController(instanceId) {
         // POST /api/products
         async createProduct(req, res) {
             try {
-                const { name, price, description, imageUrl } = req.body;
-                const newProduct = await productService.createProduct({
-                    name,
-                    price,
-                    description,
-                    imageUrl
-                });
+                const newProduct = await productService.createProduct(req.body);
                 return res.status(201).json({
                     success: true,
                     instanceId,
-                    message: 'Tạo sản phẩm mới thành công.',
+                    message: 'Tạo học liệu mới thành công.',
                     data: newProduct
                 });
             } catch (err) {
@@ -69,36 +65,59 @@ function createProductController(instanceId) {
             }
         },
 
-        // POST /api/upload
+        // PATCH /api/products/:id
+        async updateProduct(req, res) {
+            try {
+                const updated = await productService.updateProduct(req.params.id, req.body);
+                return res.status(200).json({
+                    success: true,
+                    instanceId,
+                    message: 'Cập nhật thông tin học liệu thành công.',
+                    data: updated
+                });
+            } catch (err) {
+                return res.status(err.statusCode || 500).json({
+                    success: false,
+                    instanceId,
+                    error: err.message
+                });
+            }
+        },
+
+        // POST /api/products/:id/image  hoặc  POST /api/upload
         async uploadImage(req, res) {
             try {
                 if (!req.file) {
                     return res.status(400).json({
                         success: false,
                         instanceId,
-                        error: 'Không tìm thấy tệp tin được tải lên (field name: "image").'
+                        error: 'Không tìm thấy tệp tin được tải lên (Yêu cầu field: "image").'
                     });
                 }
 
                 // Đường dẫn URL ảnh để client truy cập qua NGINX reverse proxy
                 const fileUrl = `/api/uploads/${req.file.filename}`;
 
-                // Nếu có productId gửi kèm thì cập nhật ảnh cho sản phẩm đó
-                if (req.body.productId) {
-                    await productService.updateProductImage(req.body.productId, fileUrl);
+                // Xác định productId từ params hoặc body
+                const productId = req.params.id || req.body.productId;
+                let updatedProduct = null;
+
+                if (productId) {
+                    updatedProduct = await productService.updateProductImage(productId, fileUrl);
                 }
 
                 return res.status(200).json({
                     success: true,
                     instanceId,
-                    message: 'Tải tệp tin ảnh lên thành công.',
+                    message: 'Tải và lưu trữ ảnh bìa thành công vào Volume dùng chung.',
                     file: {
                         filename: req.file.filename,
                         originalName: req.file.originalname,
                         sizeBytes: req.file.size,
                         sizeKB: (req.file.size / 1024).toFixed(2),
                         url: fileUrl
-                    }
+                    },
+                    product: updatedProduct
                 });
             } catch (err) {
                 return res.status(err.statusCode || 500).json({
@@ -121,6 +140,7 @@ function createProductController(instanceId) {
                     'x-forwarded-proto': req.headers['x-forwarded-proto'] || null
                 },
                 environment: {
+                    appName: 'HUCE Learning Store',
                     nodeVersion: process.version,
                     platform: process.platform,
                     uptimeSeconds: Math.floor(process.uptime()),
@@ -130,10 +150,21 @@ function createProductController(instanceId) {
         },
 
         // GET /api/health
-        getHealth(req, res) {
+        async getHealth(req, res) {
+            const isDbUp = await checkDbHealth();
+            if (!isDbUp) {
+                return res.status(503).json({
+                    status: 'unhealthy',
+                    instanceId,
+                    database: 'disconnected',
+                    error: 'Không thể kết nối tới cơ sở dữ liệu PostgreSQL.'
+                });
+            }
+
             return res.status(200).json({
                 status: 'healthy',
                 instanceId,
+                database: 'connected',
                 uptime: process.uptime()
             });
         }
