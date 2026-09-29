@@ -1,0 +1,52 @@
+services:
+  # NGINX Reverse Proxy Gateway
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: huce_nginx_proxy
+    restart: unless-stopped
+    ports:
+      - "8080:80"    # HTTP: host 8080 trỏ tới container port 80
+      - "8443:443"   # HTTPS: host 8443 trỏ tới container port 443
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./ssl:/etc/nginx/certs:ro
+    depends_on:
+      - backend1
+      - backend2
+    networks:
+      - app_net
+
+  # Backend Node.js - Instance 1
+  backend1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: huce_backend_1
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - INSTANCE_ID=backend-1
+    expose:
+      - "3000"       # Chỉ mở trong mạng nội bộ Docker, không publish ra host
+    networks:
+      - app_net
+
+  # Backend Node.js - Instance 2
+  backend2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: huce_backend_2
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - INSTANCE_ID=backend-2
+    expose:
+      - "3000"       # Chỉ mở trong mạng nội bộ Docker, không publish ra host
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    driver: bridge

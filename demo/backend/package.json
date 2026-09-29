@@ -1,0 +1,9 @@
+{
+  "name": "huce-nginx-demo-backend",
+  "version": "1.0.0",
+  "description": "Node.js demo backend for NGINX Reverse Proxy - Lesson 8 HUCE",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

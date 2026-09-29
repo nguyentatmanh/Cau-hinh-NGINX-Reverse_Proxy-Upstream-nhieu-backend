@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo NGINX Reverse Proxy - Nhóm 7 (HUCE)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <h1>TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI</h1>
+                <h2>KHOA CÔNG NGHỆ THÔNG TIN • HỆ THỐNG SERVER NÂNG CAO</h2>
+            </div>
+            <div class="badge-group">
+                <span class="badge badge-primary">Buổi 8: NGINX Reverse Proxy</span>
+                <span class="badge badge-secondary">Nhóm 7</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Banner thông tin kết nối -->
+        <section class="info-card">
+            <h3>Trạng thái Kết nối Hệ thống</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Origin hiện tại:</span>
+                    <strong id="currentOrigin" class="value text-primary">-</strong>
+                </div>
+                <div class="info-item">
+                    <span class="label">Giao thức:</span>
+                    <strong id="currentProto" class="value">-</strong>
+                </div>
+                <div class="info-item">
+                    <span class="label">Cổng NGINX Host:</span>
+                    <strong id="currentPort" class="value">-</strong>
+                </div>
+                <div class="info-item">
+                    <span class="label">Định tuyến API:</span>
+                    <strong class="value text-success">Same-Origin (/api/*)</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Khối điều khiển thí nghiệm -->
+        <div class="dashboard-grid">
+            <!-- Thử nghiệm 1 & 2: Gọi API Sản phẩm & Cân bằng tải Upstream -->
+            <section class="card">
+                <div class="card-header">
+                    <h3>1. Kiểm thử Reverse Proxy & Upstream</h3>
+                    <p class="subtitle">Chứng minh định tuyến Same-Origin & Cân bằng tải giữa backend1 và backend2</p>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group">
+                        <button id="btnFetchSingle" class="btn btn-primary">Tải danh sách sản phẩm (1 req)</button>
+                        <button id="btnFetchLoadBalance" class="btn btn-secondary">Gửi liên tiếp 10 request (Test Load
+                            Balancing)</button>
+                    </div>
+
+                    <div id="lbSummary" class="lb-summary hidden">
+                        <div class="lb-stat"><span class="badge-backend1">backend-1:</span> <span id="countBe1">0</span>
+                            req</div>
+                        <div class="lb-stat"><span class="badge-backend2">backend-2:</span> <span id="countBe2">0</span>
+                            req</div>
+                    </div>
+
+                    <div id="productResults" class="result-area">
+                        <p class="placeholder-text">Nhấn nút bên trên để gửi request qua NGINX reverse proxy...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Thử nghiệm 3: Kiểm tra Proxy Headers -->
+            <section class="card">
+                <div class="card-header">
+                    <h3>2. Kiểm tra Proxy Headers</h3>
+                    <p class="subtitle">Xác thực các header Host, X-Real-IP, X-Forwarded-For chuyển tới Backend</p>
+                </div>
+                <div class="card-body">
+                    <button id="btnCheckHeaders" class="btn btn-outline">Lấy thông tin Header (GET /api/info)</button>
+                    <div id="headerResults" class="result-area">
+                        <p class="placeholder-text">Chưa có dữ liệu header. Bấm nút để kiểm tra...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Thử nghiệm 4: Giới hạn Request Body (Mã 413) -->
+            <section class="card full-width">
+                <div class="card-header">
+                    <h3>3. Kiểm thử Giới hạn Request Body (Mã HTTP 413)</h3>
+                    <p class="subtitle">Kiểm chứng chỉ thị client_max_body_size (mặc định 1m vs cấu hình mở rộng)</p>
+                </div>
+                <div class="card-body">
+                    <div class="upload-controls">
+                        <label class="control-label">Chọn dung lượng payload giả lập để gửi lên:</label>
+                        <select id="payloadSizeSelect" class="form-select">
+                            <option value="512000">500 KB (Hợp lệ, dưới 1 MB -> Dự kiến HTTP 200)</option>
+                            <option value="2097152" selected>2 MB (Vượt mức 1 MB mặc định -> Dự kiến HTTP 413)</option>
+                            <option value="5242880">5 MB (Vượt mức -> Dự kiến HTTP 413 hoặc HTTP 200 nếu đã tăng lên
+                                20M)</option>
+                        </select>
+                        <button id="btnTestUpload" class="btn btn-danger">Gửi Payload (POST /api/upload)</button>
+                    </div>
+                    <div id="uploadResult" class="result-area">
+                        <p class="placeholder-text">Chọn kích thước payload và nhấn gửi để kiểm tra phản hồi từ NGINX...
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <p>Báo cáo Bài tập lớn Hệ thống Server Nâng cao • Nhóm 7 • Hà Nội, tháng 10 năm 2026</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
